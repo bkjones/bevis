@@ -30,15 +30,9 @@ def main():
     with open(args.config) as cfgpath:
         config = yaml.load(cfgpath)
 
-    #    config = {'Server': {'port': 6514,
-    #                        'log-level': logging.DEBUG,
-    #                        'log-filename': 'bevis.log'},
-    #              'AMQP': {'username': 'guest',
-    #                       'password': 'guest',
-    #                       'vhost': '/',
-    #                       'host': 'localhost'}}
     logging.basicConfig(level=log_levels[config['Server']['log-level']],
                         filename=config['Server']['log-filename'])
+
     bevis = Bevis(config)
     bevis.listen(config['Server']['port'])
 

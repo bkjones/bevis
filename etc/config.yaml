@@ -8,4 +8,21 @@ AMQP:
     username: guest
     password: guest
     vhost: /
+
+    # bevis uses a topic exchange and amqp consumers differentiate based on
+    # the routing key the messages are published with. See 'rt_key_components'
+    # below for more.
+    topic_exch: bevis
+
+    # By default, routing keys are created dynamically using the pattern
+    # 'facility.severity'
+    # This is not particularly robust, but they're the only values that are:
+    #     a) reliably calculable from an rfc5424-compliant message, and
+    #     b) generically useful.
+    # If your deployment can reliably count on hostname and appname being
+    # present in the message, you are free to use them here in place of, or
+    # in addition to severity and facility.
+    rt_key_components:
+      - 'facility'
+      - 'severity'
     host: localhost

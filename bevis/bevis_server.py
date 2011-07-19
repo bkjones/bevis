@@ -42,19 +42,20 @@ class Bevis(httpserver.HTTPServer):
         TODO: Clean up those except blocks. Yuk!
         """
 
-        def pika_on_channel_open(channel):
-            try:
-                self.pika_channel = channel
-                logging.debug("Set up self.pika_channel %s", self.pika_channel)
-            except Exception as out:
-                logging.debug(type(out), out)
-
         def pika_on_connected(connection):
             try:
                 logging.debug("Getting channel from connection...")
                 connection.channel(pika_on_channel_open)
             except Exception as out:
-                logging.debug(type(out), out)
+                logging.debug(out)
+
+        def pika_on_channel_open(channel):
+            try:
+                self.pika_channel = channel
+                logging.debug("Set up self.pika_channel %s", self.pika_channel)
+            except Exception as out:
+                logging.debug(out)
+
 
         credentials = pika.PlainCredentials(self.config["AMQP"]["username"], 
                                             self.config["AMQP"]["password"])
@@ -69,7 +70,6 @@ class Bevis(httpserver.HTTPServer):
             logging.debug("Set up TornadoConnection")
         except Exception as out:
             logging.debug(out)
-            #logging.debug(out)
 
     def stop(self):
         """Server Shutdown"""
@@ -89,16 +89,51 @@ class Bevis(httpserver.HTTPServer):
             BevisConnection(connection,
                             address,
                             self.io_loop,
-                            self.pika_channel)
+                            self.pika_channel,
+                            self.config['AMQP']['topic_exch'],
+                            self.config['AMQP']['rt_key_components'])
 
 
 def get_severity_and_facility(syslog_dict):
     """
     Parses the rfc5424 'prival' in the dict to derive
-    the severity and facility of the message, and adds
-    those keys to the dictionary.
+    the severity and facility of the message, maps them to human-readable
+    words, and adds those keys to the dictionary.
 
     """
+    sev_words = {0: 'emerg',
+                 1: 'alert',
+                 2: 'crit',
+                 3: 'err',
+                 4: 'warn',
+                 5: 'notice',
+                 6: 'info',
+                 7: 'debug'}
+
+    fac_words = {0: 'kern',
+                 1: 'user',
+                 2: 'mail',
+                 3: 'daemon',
+                 4: 'auth',
+                 5: 'syslog',
+                 6: 'lpr',
+                 7: 'news',
+                 8: 'uucp',
+                 9: 'clock',
+                 10: 'authpriv',
+                 11: 'ftp',
+                 12: 'ntp',
+                 13: 'logaudit',
+                 14: 'logalert',
+                 15: 'clock2',
+                 16: 'local0',
+                 17: 'local1',
+                 18: 'local2',
+                 19: 'local3',
+                 20: 'local4',
+                 21: 'local5',
+                 22: 'local6',
+                 23: 'local7'}
 
     prival = syslog_dict['prival']
     if not prival:
@@ -106,8 +141,8 @@ def get_severity_and_facility(syslog_dict):
 
     severity = prival & 7
     facility = (prival - severity) / 8
-    syslog_dict['severity'] = severity
-    syslog_dict['facility'] = facility
+    syslog_dict['severity'] = sev_words[severity]
+    syslog_dict['facility'] = fac_words[facility]
     return syslog_dict
 
 class BevisConnection(object):
@@ -120,7 +155,8 @@ class BevisConnection(object):
     It is also assumed that all log messages are < 4096 bytes in length.
     """
 
-    def __init__(self, socket, address, io_loop, pika_channel):
+    def __init__(self, socket, address, io_loop, pika_channel,
+                 topic_exch, rt_key_components):
         """
         Adds itself to the tornado ioloop, puts together an
         AMQP message, and publishes it.
@@ -132,6 +168,8 @@ class BevisConnection(object):
         self.fileno = socket.fileno()
         self.address = address
         self.pika_channel = pika_channel
+        self.topic_exch = topic_exch
+        self.rt_key_components = rt_key_components
 
         # setup io loop
         self.io_loop = io_loop
@@ -192,20 +230,21 @@ class BevisConnection(object):
         except Exception as out:
             logging.error(out)
 
-        syslog_json = json.dumps(syslog_dict, default=str)
-        logging.debug("Sending to AMQP: %s", syslog_json)
-
         logging.debug("Processing request...")
-        self.send_to_amqp(syslog_json)
+        self.send_to_amqp(syslog_dict)
 
-    def send_to_amqp(self, request):
+    def send_to_amqp(self, syslog_dict):
         """
         Send request to AMQP broker.
         """
+        rt_key = '.'.join([syslog_dict[i] for i in self.rt_key_components])
         logging.debug("Sending amqp message")
+        syslog_json = json.dumps(syslog_dict, default=str)
+        logging.debug("Sending to AMQP: %s", syslog_json)
 
         # Send via pika
-        self.pika_channel.basic_publish(exchange='multiplayer',
-              routing_key='foobar',
-              body=request)
+        logging.debug("RT KEY: %s EXCH: %s", rt_key, self.topic_exch)
+        self.pika_channel.basic_publish(exchange=self.topic_exch,
+              routing_key=rt_key,
+              body=syslog_json)
 
