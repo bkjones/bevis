@@ -1,0 +1,88 @@
+#!/bin/bash
+#
+# Startup script for bevis daemon.
+#
+# chkconfig: - 85 15
+# description: bevis is a syslog endpoint that forwards messages to AMQP
+# processname: bevis
+# pidfile: /var/run/bevis.pid
+
+# Source function library.
+. /etc/rc.d/init.d/functions
+
+if [ -f /etc/sysconfig/bevis ]; then
+        . /etc/sysconfig/bevis
+fi
+
+bevis=${BEVIS-`which bevis`}
+prog=bevis
+pidfile=${PIDFILE-/var/run/bevis.pid}
+lockfile=${LOCKFILE-/var/lock/subsys/bevis}
+RETVAL=0
+USER=99
+CONFIG='/opt/bevis/etc/config.yaml'
+OPTIONS="-c ${CONFIG} -u ${USER} -p ${pidfile}"
+start() {
+        echo -n $"Starting $prog: "
+        daemon $bevis $OPTIONS
+        RETVAL=$?
+        echo
+        [ $RETVAL = 0 ] && touch ${lockfile}
+        return $RETVAL
+}
+
+stop() {
+	echo -n $"Stopping $prog: "
+	killproc $bevis
+	RETVAL=$?
+	echo
+	[ $RETVAL = 0 ] && rm -f ${lockfile} ${pidfile}
+}
+reload() {
+    echo -n $"Reloading $prog: "
+    if ! $bevis $OPTIONS  -t >&/dev/null; then
+        RETVAL=$?
+        echo $"reload failed"
+        failure $"reloading $bevis failed"
+    else
+        killproc $bevis -HUP
+        RETVAL=$?
+    fi
+    echo
+}
+
+# See how we were called.
+case "$1" in
+  start)
+	start
+	;;
+  stop)
+	stop
+	;;
+  status)
+        status $prog
+	RETVAL=$?
+	;;
+  restart)
+	stop
+	start
+	;;
+  condrestart)
+	if [ -f ${pidfile} ] ; then
+		stop
+		start
+	fi
+	;;
+  reload)
+        reload
+	;;
+  graceful|help|configtest|fullstatus)
+	$bevis $@
+	RETVAL=$?
+	;;
+  *)
+	echo $"Usage: $prog {start|stop|restart|condrestart|reload|status|fullstatus|graceful|help|configtest}"
+	exit 1
+esac
+
+exit $RETVAL

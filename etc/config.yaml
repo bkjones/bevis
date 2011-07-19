@@ -1,0 +1,11 @@
+%YAML 1.2
+---
+Server:
+    port: 6514
+    log-level: debug
+    log-filename: bevis.log
+AMQP:
+    username: guest
+    password: guest
+    vhost: /
+    host: localhost

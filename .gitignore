@@ -1,0 +1,6 @@
+*.log
+.idea
+*.pyc
+*.swp
+build
+dist
