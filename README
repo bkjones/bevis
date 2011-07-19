@@ -1,0 +1,49 @@
+================
+Bevis
+================
+
+What is it?
+--------------
+
+It's a syslog listener that forwards messages to AMQP. So, you can tell
+rsyslog to send messages to Bevis, and tell Bevis how you want it to act
+with regards to sending the messages on to an AMQP server: what host to send
+to, how to create vhosts, exchanges, and queues, etc. and/or how to
+dynamically change the routing key based on components of the syslog
+messages. 
+
+What's required?
+--------------------------
+Python 2.7 (I use argparse)
+An rfc5424-compliant syslog source (I test with rsyslog)
+pika (I test with 0.9.5)
+tornado (I test with 2.0git)
+loggerglue (I test with 1.0)
+
+What's rfc5424, and how do I know if I'm compliant?
+--------------------------
+
+RFC 5424 defines the syslog protocol. Oddly, it seems difficult to find
+compliant applications. In some cases it's hard to even verify compliance:
+Linux syslogd's man page (and related ones like syslog.conf and syslog)
+don't mention what RFC it is compliant with. So, to be completely honest, I
+don't (yet) have a bullet-proof answer for you on how to tell if you're
+compliant. 
+
+I *can* tell you that I test with rsyslog and it is *able* to forward syslog
+messages from whatever application it gets them from, to Bevis, in rfc5424
+format. Here's the line in my rsyslog configuration that does the trick: 
+
+*.*  @@127.0.0.1:6514;RSYSLOG_SyslogProtocol123Format
+
+This is a test setup wherein I forward a copy of everything (*.*) to a Bevis
+server on the localhost (127.0.0.1) listening on port 6514. After the
+semicolon is the name of an rsyslog 'template'.
+
+The '23' in the template name refers to
+http://tools.ietf.org/html/draft-ietf-syslog-protocol-23, which it appears
+is obsoleted by rfc5424, which itself seems to be a bugfix update to 23.
+Don't quote me on that.
+
+
+

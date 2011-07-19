@@ -185,11 +185,10 @@ class BevisConnection(object):
         """Processing of the log entry. Later this will do more work"""
         syslog_dict = {}
         try:
-            print request
+            logging.debug("INCOMING REQ: %s" % request)
             syslog_entry = SyslogEntry.from_line(request)
             syslog_dict = syslog_entry.__dict__
             syslog_dict = get_severity_and_facility(syslog_dict)
-            print(syslog_dict)
         except Exception as out:
             logging.error(out)
 
@@ -209,22 +208,4 @@ class BevisConnection(object):
         self.pika_channel.basic_publish(exchange='multiplayer',
               routing_key='foobar',
               body=request)
-
-
-if __name__ == '__main__':
-    config = {'Server': {'port': 6514, 
-                        'log-level': logging.DEBUG, 
-                        'log-filename': 'bevis.log'}, 
-              'AMQP': {'username': 'guest', 
-                       'password': 'guest', 
-                       'vhost': '/',
-                       'host': 'localhost'}}
-    logging.basicConfig(level=config['Server']['log-level'], filename=config['Server']['log-filename'])
-    bevis = Bevis(config)
-    bevis.listen(config['Server']['port'])
-
-    try:
-        ioloop.IOLoop.instance().start()
-    except KeyboardInterrupt:
-        bevis.stop()
 
