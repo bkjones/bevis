@@ -27,11 +27,11 @@ http://www.youtube.com/watch?v=mL7n5mEmXJo
 
 What's required?
 --------------------------
-Python 2.7 (I use argparse)
-An rfc5424-compliant syslog source (I test with rsyslog)
-pika (I test with 0.9.5)
-tornado (I test with 2.0git)
-loggerglue (I test with 1.0)
+- Python 2.7 (I use argparse)
+- An rfc5424-compliant syslog source (I test with rsyslog)
+- pika (I test with 0.9.5)
+- tornado (I test with 2.0git)
+- loggerglue (I test with 1.0)
 
 Blindingly Fast Start
 ----------------------
