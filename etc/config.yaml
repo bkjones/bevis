@@ -5,6 +5,7 @@ Server:
     log-level: debug
     log-filename: bevis.log
 AMQP:
+    host: localhost
     username: guest
     password: guest
     vhost: /
@@ -17,12 +18,22 @@ AMQP:
     # By default, routing keys are created dynamically using the pattern
     # 'facility.severity'
     # This is not particularly robust, but they're the only values that are:
+    #
     #     a) reliably calculable from an rfc5424-compliant message, and
     #     b) generically useful.
+    #
     # If your deployment can reliably count on hostname and appname being
     # present in the message, you are free to use them here in place of, or
     # in addition to severity and facility.
-    rt_key_components:
-      - 'facility'
-      - 'severity'
-    host: localhost
+    # 
+    # The list of valid message components is here: procid, app_name, facility
+    # timestamp, hostname, version, msgid, msg, prival, structured_data,
+    # severity
+    #
+    # You can technically use any combination of them in the rt_key_components
+    # (though some are more useful than others) and Bevis will join them all
+    # with a '.' separating them, and use that as the routing key. 
+    
+    rt_key_components: 
+        - facility
+        - severity

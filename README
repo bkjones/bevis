@@ -2,15 +2,15 @@
 Bevis
 ================
 
+
 What is it?
 --------------
 
-It's a syslog listener that forwards messages to AMQP. So, you can tell
-rsyslog to send messages to Bevis, and tell Bevis how you want it to act
-with regards to sending the messages on to an AMQP server: what host to send
-to, how to create vhosts, exchanges, and queues, etc. and/or how to
-dynamically change the routing key based on components of the syslog
-messages. 
+It's a syslog listener that forwards messages to AMQP (RabbitMQ, specifically).
+So, you can tell rsyslog to send messages to Bevis, and tell Bevis how you want
+it to act with regards to sending the messages on to an AMQP server. Namely, you 
+can tell it what components of the syslog message to use in building a routing key 
+for the message.
 
 What's required?
 --------------------------
@@ -20,8 +20,28 @@ pika (I test with 0.9.5)
 tornado (I test with 2.0git)
 loggerglue (I test with 1.0)
 
+Blindingly Fast Start
+----------------------
+
+::
+  $ git clone http://github.com/bkjones/bevis.git
+  $ cd bevis
+  $ python setup.py install
+  $ bevis -c etc/config.yaml -f # run in the foreground
+
+*Open another terminal*
+
+::
+  $ python test_bevis.py
+  $ tail bevis.log
+
+You should see an attempt to publish the message, and the message itself in the log.
+If you have a RabbitMQ server running on localhost, *and* you have an exchange set up 
+*and* a queue bound to it as specified in config.yaml, there should be a message in 
+your queue.
+
 What's rfc5424, and how do I know if I'm compliant?
---------------------------
+-----------------------------------------------------
 
 RFC 5424 defines the syslog protocol. Oddly, it seems difficult to find
 compliant applications. In some cases it's hard to even verify compliance:
