@@ -58,6 +58,8 @@ your queue.
 What's rfc5424, and how do I know if I'm compliant?
 -----------------------------------------------------
 
+http://tools.ietf.org/html/rfc5424
+
 RFC 5424 defines the syslog protocol. Oddly, it seems difficult to find
 compliant applications. In some cases it's hard to even verify compliance:
 Linux syslogd's man page (and related ones like syslog.conf and syslog)
