@@ -12,6 +12,19 @@ it to act with regards to sending the messages on to an AMQP server. Namely, you
 can tell it what components of the syslog message to use in building a routing key 
 for the message.
 
+What's with the name?
+----------------------
+
+I wanted to call it 'lumberjack', since it deals with logs. Too hard to find in
+a Google search and a pretty common software project name. 
+
+Then I thought 'logue', since it's a combination of 'log' and 'queue'. Just
+thought I could do better. 
+
+Bevis is the name of a rather interesting lumberjack from a Monty Python skit
+(bevis is written in Python, which is named after Monty Python). See the skit:
+http://www.youtube.com/watch?v=mL7n5mEmXJo
+
 What's required?
 --------------------------
 Python 2.7 (I use argparse)
