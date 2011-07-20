@@ -69,7 +69,7 @@ I *can* tell you that I test with rsyslog and it is *able* to forward syslog
 messages from whatever application it gets them from, to Bevis, in rfc5424
 format. Here's the line in my rsyslog configuration that does the trick: 
 
-*.*  @@127.0.0.1:6514;RSYSLOG_SyslogProtocol123Format
+\*.\*  @@127.0.0.1:6514;RSYSLOG_SyslogProtocol123Format
 
 This is a test setup wherein I forward a copy of everything (*.*) to a Bevis
 server on the localhost (127.0.0.1) listening on port 6514. After the
