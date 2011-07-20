@@ -1,6 +1,6 @@
 import sys
 import os
-def daemonize (pidfile=None, user=None, stdin='/dev/null', stdout='/dev/null', stderr='/dev/null'):
+def daemonize(pidfile=None, user=None, stdin='/dev/null', stdout='/dev/null', stderr='/dev/null'):
     if user is None:
         user = os.geteuid()
 
