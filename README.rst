@@ -37,6 +37,7 @@ Blindingly Fast Start
 ----------------------
 
 ::
+
   $ git clone http://github.com/bkjones/bevis.git
   $ cd bevis
   $ python setup.py install
@@ -45,6 +46,7 @@ Blindingly Fast Start
 *Open another terminal*
 
 ::
+
   $ python test_bevis.py
   $ tail bevis.log
 
