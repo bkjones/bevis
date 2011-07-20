@@ -71,7 +71,7 @@ format. Here's the line in my rsyslog configuration that does the trick:
 
 \*.\*  @@127.0.0.1:6514;RSYSLOG_SyslogProtocol123Format
 
-This is a test setup wherein I forward a copy of everything (*.*) to a Bevis
+This is a test setup wherein I forward a copy of everything (\*.\*) to a Bevis
 server on the localhost (127.0.0.1) listening on port 6514. After the
 semicolon is the name of an rsyslog 'template'.
 
