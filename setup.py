@@ -14,7 +14,7 @@ setup(name='bevis',
       url='http://github.com/bkjones/bevis',
       py_modules=['bevis_run'],
       packages=['bevis'],
-      requires=['tornado', 'pika', 'loggerglue'],
+      requires=['tornado', 'pika', 'loggerglue', 'pyyaml'],
       entry_points=dict(console_scripts=['bevis=bevis_run:main']),
       zip_safe=False)
 

@@ -32,6 +32,7 @@ What's required?
 - pika (I test with 0.9.5)
 - tornado 2.x (I test with 2.0git and the PyPI 2.0 release)
 - loggerglue (I test with 1.0)
+- PyYAML
 
 Blindingly Fast Start
 ----------------------
